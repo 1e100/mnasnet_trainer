@@ -6,6 +6,7 @@ import torch
 
 
 class TopKMetric:
+
     def __init__(self, k: int) -> None:
         self.k = k
 

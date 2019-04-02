@@ -12,8 +12,8 @@ _IMAGENET_STDS = [0.229, 0.224, 0.225]
 
 
 def imagenet_normalize() -> torchvision.transforms.Normalize:
-    return torchvision.transforms.Normalize(
-        mean=_IMAGENET_MEANS, std=_IMAGENET_STDS, inplace=True)
+    return torchvision.transforms.Normalize(mean=_IMAGENET_MEANS,
+                                            std=_IMAGENET_STDS, inplace=True)
 
 
 def training_augmentation(size: int = 224) -> torchvision.transforms.Compose:

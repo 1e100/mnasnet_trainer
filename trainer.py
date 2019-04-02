@@ -21,8 +21,18 @@ import log
 import performance
 import human_readable
 
+LOG_INTERVAL = 10
+CONFIG_FILE_NAME = "run.config"
+CHECKPOINT_FILE_NAME = "checkpoint.pth"
+BEST_CHECKPOINT_FILE_NAME = "best_" + CHECKPOINT_FILE_NAME
+
+
+def _full_type_name(obj):
+    return "{}.{}".format(obj.__module__, type(obj).__qualname__)
+
 
 class Trainer:
+
     def __init__(self, run_dir: str, run_description: str, problem_type: str,
                  load_checkpoint: bool, model: nn.Module,
                  optimizer: optim.Optimizer, loss: nn.Module,
@@ -64,30 +74,22 @@ class Trainer:
         self.checkpoint_path = os.path.join(self.run_dir, CHECKPOINT_FILE_NAME)
         self.best_checkpoint_path = os.path.join(self.run_dir,
                                                  BEST_CHECKPOINT_FILE_NAME)
-        self.average_data_duration = util.performance.MovingAverage(32)
-        self.average_compute_duration = util.performance.MovingAverage(32)
+        self.average_data_duration = performance.MovingAverage(32)
+        self.average_compute_duration = performance.MovingAverage(32)
         # Checkpoint reload, if requested.
         if load_checkpoint:
             self._load_checkpoint()
 
-    def fit(self,
-            train_set: torch.utils.data.Dataset,
-            validation_set: torch.utils.data.Dataset,
-            num_epochs: int = 100,
+    def fit(self, train_set: torch.utils.data.Dataset,
+            validation_set: torch.utils.data.Dataset, num_epochs: int = 100,
             batch_size: int = 128,
             num_workers: int = multiprocessing.cpu_count()):
         train_loader = torch.utils.data.DataLoader(
-            train_set,
-            batch_size=batch_size,
-            shuffle=True,
-            num_workers=num_workers,
-            pin_memory=True)
+            train_set, batch_size=batch_size, shuffle=True,
+            num_workers=num_workers, pin_memory=True)
         val_loader = torch.utils.data.DataLoader(
-            validation_set,
-            batch_size=batch_size,
-            shuffle=False,
-            num_workers=num_workers,
-            pin_memory=True)
+            validation_set, batch_size=batch_size, shuffle=False,
+            num_workers=num_workers, pin_memory=True)
 
         log.info(">> Starting training at epoch {}, global step {}.".format(
             self.epoch, self.global_step))
@@ -129,8 +131,8 @@ class Trainer:
                 # groups.
                 lr = self.lr_scheduler.get_lr()[0]
                 log.info("Learning rate is {}", lr)
-                tensorboard.add_scalar(
-                    "train/lr", lr, global_step=self.global_step)
+                tensorboard.add_scalar("train/lr", lr,
+                                       global_step=self.global_step)
 
             # Training
             self._train(train_loader)
@@ -139,11 +141,11 @@ class Trainer:
 
             # Log results, save checkpoint, save best checkpoint
             # if best model is found.
-            tensorboard.add_scalar(
-                "val/loss", val_loss, global_step=self.global_step)
+            tensorboard.add_scalar("val/loss", val_loss,
+                                   global_step=self.global_step)
             for m in val_metrics:
-                tensorboard.add_scalar(
-                    "val/{}".format(m[0]), m[1], global_step=self.global_step)
+                tensorboard.add_scalar("val/{}".format(m[0]), m[1],
+                                       global_step=self.global_step)
             metrics_str = ", ".join(
                 ["{}={:.3f}".format(m[0], m[1]) for m in val_metrics])
             log.info("VAL: loss={:.3f}, metrics = {}", val_loss, metrics_str)
@@ -168,8 +170,7 @@ class Trainer:
         data_start_time = time.perf_counter()
         for batch_index, (inputs, annotations) in enumerate(train_loader, 0):
             compute_start_time = time.perf_counter()
-            self.average_data_duration.add(compute_start_time -
-                                           data_start_time)
+            self.average_data_duration.add(compute_start_time - data_start_time)
             # DataParallel models handle device placement of inputs on their own.
             if not isinstance(self.model, nn.DataParallel):
                 inputs = inputs.to(self.devices[0], non_blocking=True)
@@ -191,16 +192,15 @@ class Trainer:
                     100. * batch_index / len(train_loader),
                     self.average_data_duration.get(),
                     self.average_compute_duration.get(), loss.item())
-                tensorboard.add_scalar(
-                    "train/loss".format(self.epoch),
-                    loss.item(),
-                    global_step=self.global_step)
+                tensorboard.add_scalar("train/loss".format(self.epoch),
+                                       loss.item(),
+                                       global_step=self.global_step)
             self.global_step += 1
             # Console output is excluded from timings.
             data_start_time = time.perf_counter()
         mean_loss = numpy.mean(losses)
-        tensorboard.add_scalar(
-            "train/mean_loss", mean_loss, global_step=self.epoch)
+        tensorboard.add_scalar("train/mean_loss", mean_loss,
+                               global_step=self.epoch)
         log.info("Mean training loss for epoch {}: {:.5f}", self.epoch,
                  mean_loss)
 
@@ -213,7 +213,7 @@ class Trainer:
         return self.global_step
 
     def _validate(self, val_loader: torch.utils.data.DataLoader
-                  ) -> Tuple[numpy.float64, List[Tuple[str, float]]]:
+                 ) -> Tuple[numpy.float64, List[Tuple[str, float]]]:
         """ Returns validation lost and a list of (name, metric) tuples to print. """
         log.info("Validation epoch {}, global step {}", self.epoch,
                  self.global_step)
@@ -313,5 +313,4 @@ class Trainer:
     def _write_json(self, dict: Dict[str, Any], file_name: str) -> None:
         """ Writes `dict` as JSON file to the current `run_dir`. """
         with open(os.path.join(self.run_dir, file_name), "w") as out_f:
-            json.dump(
-                dict, out_f, sort_keys=True, indent=2, ensure_ascii=False)
+            json.dump(dict, out_f, sort_keys=True, indent=2, ensure_ascii=False)

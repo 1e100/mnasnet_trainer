@@ -8,10 +8,17 @@ parameters on a machine with 4 1080ti GPUs you should obtain approximately
 
 import os
 import typing
+import multiprocessing
+
+import torch
+import torchvision.models as models
 
 import trainer
 import imagenet
-import torchvision.models.MNASNet1_0
+import metrics
+import imagenet
+import log
+import tensorboard
 
 NUM_EPOCHS = 200
 BASE_LR = 0.7
@@ -26,11 +33,8 @@ class CosineWithWarmup(torch.optim.lr_scheduler._LRScheduler):
     """ Implements a schedule where the first few epochs are linear warmup, and
     then there's cosine annealing after that."""
 
-    def __init__(self,
-                 optimizer: torch.optim.Optimizer,
-                 warmup_len: int,
-                 warmup_start_multiplier: float,
-                 max_epochs: int,
+    def __init__(self, optimizer: torch.optim.Optimizer, warmup_len: int,
+                 warmup_start_multiplier: float, max_epochs: int,
                  last_epoch: int = -1):
         if warmup_len < 0:
             raise ValueError("Warmup can't be less than 0.")
@@ -69,41 +73,26 @@ class CosineWithWarmup(torch.optim.lr_scheduler._LRScheduler):
 
 
 def train() -> None:
-    train_dataset = datasets.imagenet.training(IMAGENET_DIR)
-    val_dataset = datasets.imagenet.validation(IMAGENET_DIR)
-
-    model = torchvision.models.mnasnet.MNasNet1_0(1000).cuda()
+    model = models.MNASNet1_0(1000).cuda()
     if torch.cuda.device_count() > 1:
         model = torch.nn.DataParallel(model)
-    optimizer = torch.optim.SGD(
-        model.parameters(),
-        lr=BASE_LR,
-        momentum=MOMENTUM,
-        weight_decay=WEIGHT_DECAY,
-        nesterov=True)
+    optimizer = torch.optim.SGD(model.parameters(), lr=BASE_LR,
+                                momentum=MOMENTUM, weight_decay=WEIGHT_DECAY,
+                                nesterov=True)
     loss = torch.nn.CrossEntropyLoss().cuda()
-    lr_schedule = training.lr_schedule.CosineWithWarmup(
-        optimizer, WARMUP, 0.1, NUM_EPOCHS)
+    lr_schedule = CosineWithWarmup(optimizer, WARMUP, 0.1, NUM_EPOCHS)
 
-    trainer = training.trainer.Trainer(
-        ".",
-        "MNASNet 1.0, cosine annealing with warmup, "
-        "base_lr=0.7, 200 epochs.",
-        "multiclass_classification",
-        True,
-        model,
-        optimizer,
-        loss,
-        lr_schedule,
-        metrics.default(),
-        cudnn_autotune=True)
+    train_dataset = imagenet.training(IMAGENET_DIR)
+    val_dataset = imagenet.validation(IMAGENET_DIR)
 
-    trainer.fit(
-        train_dataset,
-        val_dataset,
-        num_epochs=NUM_EPOCHS,
-        batch_size=BATCH_SIZE,
-        num_workers=multiprocessing.cpu_count())
+    train = trainer.Trainer(
+        ".", "MNASNet 1.0, cosine annealing with warmup, "
+        "base_lr=0.7, 200 epochs.", "multiclass_classification", True, model,
+        optimizer, loss, lr_schedule, metrics.default(), cudnn_autotune=True)
+
+    train.fit(train_dataset, val_dataset, num_epochs=NUM_EPOCHS,
+              batch_size=BATCH_SIZE,
+              num_workers=multiprocessing.cpu_count() // 2)
 
 
 if __name__ == "__main__":

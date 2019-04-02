@@ -36,8 +36,8 @@ def close_log_file():
 def add_scalar(tag, scalar_value, global_step=None, walltime=None):
     """ Adds a scalar value for a given tag, e.g. `learning_rate` or `train_loss` """
     if _writer:
-        _writer.add_scalar(
-            tag, scalar_value, global_step=global_step, walltime=walltime)
+        _writer.add_scalar(tag, scalar_value, global_step=global_step,
+                           walltime=walltime)
 
 
 def add_scalars(main_tag, tag_scalar_dict, global_step=None):
@@ -50,8 +50,8 @@ def add_scalars(main_tag, tag_scalar_dict, global_step=None):
 def add_image(tag, image, global_step=None, walltime=None):
     """ Adds an image (tensor or ndarray) for a given tag. """
     if _writer:
-        _writer.add_image(
-            tag, image, global_step=global_step, walltime=walltime)
+        _writer.add_image(tag, image, global_step=global_step,
+                          walltime=walltime)
 
 
 def add_images(tag, images, global_step=None):
@@ -63,8 +63,8 @@ def add_images(tag, images, global_step=None):
 def add_image_with_boxes(self, tag, img_tensor, box_tensor, global_step=None):
     """ Adds image with bounding boxes overlaid. For detection. """
     if _writer:
-        _writer.add_image_with_boxes(
-            tag, img_tensor, box_tensor, global_step=global_step)
+        _writer.add_image_with_boxes(tag, img_tensor, box_tensor,
+                                     global_step=global_step)
 
 
 def add_text(tag, text, global_step=None):
@@ -75,5 +75,5 @@ def add_text(tag, text, global_step=None):
 def add_figure(tag, figure, global_step=None, walltime=None):
     """ Adds a matplotlib figure for a given tag. """
     if _writer:
-        _writer.add_figure(
-            tag, figure, global_step=global_step, walltime=walltime)
+        _writer.add_figure(tag, figure, global_step=global_step,
+                           walltime=walltime)
