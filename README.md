@@ -5,7 +5,7 @@ Result after 200 epochs:
   * Top-1 = 73.512
   * Top-5 = 91.544
   
-This program with hardcoded settings requires 4x NVIDIA GTX 1080ti GPUs to run.
+This program with hardcoded settings requires 4x NVIDIA GTX 1080ti GPUs to run. Give it more epochs and it'll get even closer to paper numbers.
 
 ## Requirements:
 
