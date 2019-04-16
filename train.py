@@ -73,7 +73,7 @@ class CosineWithWarmup(torch.optim.lr_scheduler._LRScheduler):
 
 
 def train() -> None:
-    model = models.MNASNet1_0(1000).cuda()
+    model = models.mnasnet1_0(1000).cuda()
     if torch.cuda.device_count() > 1:
         model = torch.nn.DataParallel(model)
     optimizer = torch.optim.SGD(model.parameters(), lr=BASE_LR,

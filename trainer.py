@@ -306,9 +306,9 @@ class Trainer:
             checkpoint_state[
                 "lr_scheduler_state_dict"] = self.lr_scheduler.state_dict()
         torch.save(checkpoint_state, self.checkpoint_path)
-        # If a new best model was found, set it aside.
+        # If a new best model was found, set aside a "bare" model checkpoint for it.
         if is_new_best:
-            shutil.copyfile(self.checkpoint_path, self.best_checkpoint_path)
+            torch.save(model.state_dict(), self.best_checkpoint_path)
 
     def _write_json(self, dict: Dict[str, Any], file_name: str) -> None:
         """ Writes `dict` as JSON file to the current `run_dir`. """
