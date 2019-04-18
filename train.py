@@ -21,12 +21,26 @@ import imagenet
 import log
 import tensorboard
 
-NUM_EPOCHS = 250
-BASE_LR = 1.0
-MOMENTUM = 0.9
+# TODO: Add 0.75 and 1.3 as well.
+MODEL_NAME = "mnasnet0_5"
+TRAINING_PARAMS = {
+    "mnasnet0_5": {
+        "num_epochs": 250,
+        "base_lr": 1.0,
+        "momentum": 0.9,
+        "weight_decay": 0,
+        "batch_size": 1000,
+    },
+    "mnasnet1_0": {
+        "num_epochs": 200,
+        "base_lr": 0.7,
+        "momentum": 0.9,
+        "weight_decay": 1e-5,
+        "batch_size": 740,
+    }
+}
+
 WARMUP = 5
-WEIGHT_DECAY = 0
-BATCH_SIZE = 1000
 IMAGENET_DIR = os.path.expanduser("~/datasets/imagenet")
 
 
@@ -74,14 +88,21 @@ class CosineWithWarmup(torch.optim.lr_scheduler._LRScheduler):
 
 
 def train() -> None:
-    model = models.mnasnet0_5(1000).cuda()
+    if model_name == "mnasnet0_5":
+        model = models.mnasnet0_5(1000).cuda()
+    elif model_name == "mnasnet1_0":
+        model = models.mnasnet1_0(1000).cuda()
+    else:
+        raise ValueError("Don't know how to train {}".format(model_name))
+    params = TRAINING_PARAMS[model_name]
+
     if torch.cuda.device_count() > 1:
         model = torch.nn.DataParallel(model)
-    optimizer = torch.optim.SGD(model.parameters(), lr=BASE_LR,
-                                momentum=MOMENTUM, weight_decay=WEIGHT_DECAY,
-                                nesterov=True)
+    optimizer = torch.optim.SGD(
+        model.parameters(), lr=params["base_lr"], momentum=params["momentum"],
+        weight_decay=params["weight_decay"], nesterov=True)
     loss = torch.nn.CrossEntropyLoss().cuda()
-    lr_schedule = CosineWithWarmup(optimizer, WARMUP, 0.1, NUM_EPOCHS)
+    lr_schedule = CosineWithWarmup(optimizer, WARMUP, 0.1, params["num_epochs"])
 
     train_dataset = imagenet.training(IMAGENET_DIR)
     val_dataset = imagenet.validation(IMAGENET_DIR)
@@ -91,8 +112,8 @@ def train() -> None:
         "base_lr=1.0, 250 epochs.", "multiclass_classification", True, model,
         optimizer, loss, lr_schedule, metrics.default(), cudnn_autotune=True)
 
-    train.fit(train_dataset, val_dataset, num_epochs=NUM_EPOCHS,
-              batch_size=BATCH_SIZE,
+    train.fit(train_dataset, val_dataset, num_epochs=params["num_epochs"],
+              batch_size=params["batch_size"],
               num_workers=multiprocessing.cpu_count())
 
 
