@@ -9,6 +9,8 @@ import shutil
 import sys
 import tempfile
 import time
+import re
+import datetime
 
 import numpy
 import torch
@@ -306,6 +308,11 @@ class Trainer:
             checkpoint_state[
                 "lr_scheduler_state_dict"] = self.lr_scheduler.state_dict()
         torch.save(checkpoint_state, self.checkpoint_path)
+        # Save all model checkpoints with timestamp. A better way to do this
+        # would be to track the metric and save checkpoints when metric
+        # improves, but that's too much work for now.
+        ts = re.sub("[:-]", "", datetime.datetime.now().isoformat())
+        torch.save(model.state_dict(), "{}-{}".format(self.best_checkpoint_path, ts))
         # If a new best model was found, set aside a "bare" model checkpoint for it.
         if is_new_best:
             torch.save(model.state_dict(), self.best_checkpoint_path)
