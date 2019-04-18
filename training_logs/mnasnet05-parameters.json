@@ -1,0 +1,5 @@
+{
+  "description": "MNASNet 0.5, cosine annealing with warmup, base_lr=1.0, 250 epochs.",
+  "model_type_name": "torchvision.models.mnasnet.MNASNet",
+  "problem_type": "multiclass_classification"
+}
