@@ -32,7 +32,7 @@ TRAINING_PARAMS = {
         "batch_size": 1000,
     },
     "mnasnet1_0": {
-        "num_epochs": 200,
+        "num_epochs": 300,
         "base_lr": 0.7,
         "momentum": 0.9,
         "weight_decay": 1e-5,
