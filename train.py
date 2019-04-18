@@ -21,12 +21,12 @@ import imagenet
 import log
 import tensorboard
 
-NUM_EPOCHS = 200
-BASE_LR = 0.7
+NUM_EPOCHS = 250
+BASE_LR = 1.0
 MOMENTUM = 0.9
 WARMUP = 5
-WEIGHT_DECAY = 1e-5
-BATCH_SIZE = 740
+WEIGHT_DECAY = 0
+BATCH_SIZE = 1000
 IMAGENET_DIR = os.path.expanduser("~/datasets/imagenet")
 
 
@@ -74,7 +74,7 @@ class CosineWithWarmup(torch.optim.lr_scheduler._LRScheduler):
 
 
 def train() -> None:
-    model = models.mnasnet1_0(1000).cuda()
+    model = models.mnasnet0_5(1000).cuda()
     if torch.cuda.device_count() > 1:
         model = torch.nn.DataParallel(model)
     optimizer = torch.optim.SGD(model.parameters(), lr=BASE_LR,
@@ -87,13 +87,13 @@ def train() -> None:
     val_dataset = imagenet.validation(IMAGENET_DIR)
 
     train = trainer.Trainer(
-        ".", "MNASNet 1.0, cosine annealing with warmup, "
-        "base_lr=0.7, 200 epochs.", "multiclass_classification", True, model,
+        ".", "MNASNet 0.5, cosine annealing with warmup, "
+        "base_lr=1.0, 250 epochs.", "multiclass_classification", True, model,
         optimizer, loss, lr_schedule, metrics.default(), cudnn_autotune=True)
 
     train.fit(train_dataset, val_dataset, num_epochs=NUM_EPOCHS,
               batch_size=BATCH_SIZE,
-              num_workers=multiprocessing.cpu_count() // 2)
+              num_workers=multiprocessing.cpu_count())
 
 
 if __name__ == "__main__":
