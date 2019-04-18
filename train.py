@@ -87,7 +87,7 @@ class CosineWithWarmup(torch.optim.lr_scheduler._LRScheduler):
         return [base_lr * lr_multiplier for base_lr in self.base_lrs]
 
 
-def train() -> None:
+def train(model_name: str) -> None:
     if model_name == "mnasnet0_5":
         model = models.mnasnet0_5(1000).cuda()
     elif model_name == "mnasnet1_0":
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     log.open_log_file(output_dir=".")
     tensorboard.open_log_file(output_dir=".")
     try:
-        train()
+        train(MODEL_NAME)
     finally:
         log.close_log_file()
         tensorboard.close_log_file()
