@@ -22,7 +22,7 @@ import log
 import tensorboard
 
 # TODO: Add 0.75 and 1.3 as well.
-MODEL_NAME = "mnasnet0_5"
+MODEL_NAME = "mnasnet1_0"
 TRAINING_PARAMS = {
     "mnasnet0_5": {
         "num_epochs": 250,
