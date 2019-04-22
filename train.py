@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-""" A training program for MNASNet 1.0.
+""" A training program for MNASNet family of models.
 
 All parameters are hardcoded for better reproducibility. This training harness
-targets MNASNet with a depth multiplier of 1.0. By running it with these
-parameters on a machine with 4 1080ti GPUs you should obtain approximately
-73.512% top-1 accuracy on ImageNet. """
+targets MNASNet with various depth multipliers. To change the depth multiplier,
+simply set `MODEL_NAME` variable to the model you want. 4x1080ti are assumed.
+Fewer GPUs will require smaller batches and smaller learning rates."""
 
 import os
 import typing
@@ -21,7 +21,7 @@ import imagenet
 import log
 import tensorboard
 
-MODEL_NAME = "mnasnet1_0"
+MODEL_NAME = "mnasnet0_75"
 TRAINING_PARAMS = {
     "mnasnet0_5": {
         "num_epochs": 250,
