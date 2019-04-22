@@ -21,7 +21,6 @@ import imagenet
 import log
 import tensorboard
 
-# TODO: Add 0.75 and 1.3 as well.
 MODEL_NAME = "mnasnet1_0"
 TRAINING_PARAMS = {
     "mnasnet0_5": {
@@ -31,9 +30,23 @@ TRAINING_PARAMS = {
         "weight_decay": 0,
         "batch_size": 1000,
     },
+    "mnasnet0_75": {
+        "num_epochs": 300,
+        "base_lr": 0.8,
+        "momentum": 0.9,
+        "weight_decay": 0,
+        "batch_size": 1000,
+    },
     "mnasnet1_0": {
         "num_epochs": 300,
         "base_lr": 0.7,
+        "momentum": 0.9,
+        "weight_decay": 1e-5,
+        "batch_size": 740,
+    },
+    "mnasnet1_3": {
+        "num_epochs": 300,
+        "base_lr": 0.35,
         "momentum": 0.9,
         "weight_decay": 1e-5,
         "batch_size": 740,
