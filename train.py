@@ -103,8 +103,12 @@ class CosineWithWarmup(torch.optim.lr_scheduler._LRScheduler):
 def train(model_name: str) -> None:
     if model_name == "mnasnet0_5":
         model = models.mnasnet0_5(1000).cuda()
+    if model_name == "mnasnet0_75":
+        model = models.mnasnet0_75(1000).cuda()
     elif model_name == "mnasnet1_0":
         model = models.mnasnet1_0(1000).cuda()
+    if model_name == "mnasnet1_3":
+        model = models.mnasnet1_3(1000).cuda()
     else:
         raise ValueError("Don't know how to train {}".format(model_name))
     params = TRAINING_PARAMS[model_name]
