@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-""" A training program for MNASNet 1.0.
+""" A training program for MNASNet family of models.
 
 All parameters are hardcoded for better reproducibility. This training harness
-targets MNASNet with a depth multiplier of 1.0. By running it with these
-parameters on a machine with 4 1080ti GPUs you should obtain approximately
-73.512% top-1 accuracy on ImageNet. """
+targets MNASNet with various depth multipliers. To change the depth multiplier,
+simply set `MODEL_NAME` variable to the model you want. 4x1080ti are assumed.
+Fewer GPUs will require smaller batches and smaller learning rates."""
 
 import os
 import typing
@@ -21,8 +21,7 @@ import imagenet
 import log
 import tensorboard
 
-# TODO: Add 0.75 and 1.3 as well.
-MODEL_NAME = "mnasnet1_0"
+MODEL_NAME = "mnasnet0_75"
 TRAINING_PARAMS = {
     "mnasnet0_5": {
         "num_epochs": 250,
@@ -31,9 +30,23 @@ TRAINING_PARAMS = {
         "weight_decay": 0,
         "batch_size": 1000,
     },
+    "mnasnet0_75": {
+        "num_epochs": 300,
+        "base_lr": 0.8,
+        "momentum": 0.9,
+        "weight_decay": 0,
+        "batch_size": 1000,
+    },
     "mnasnet1_0": {
         "num_epochs": 300,
         "base_lr": 0.7,
+        "momentum": 0.9,
+        "weight_decay": 1e-5,
+        "batch_size": 740,
+    },
+    "mnasnet1_3": {
+        "num_epochs": 300,
+        "base_lr": 0.35,
         "momentum": 0.9,
         "weight_decay": 1e-5,
         "batch_size": 740,
@@ -90,8 +103,12 @@ class CosineWithWarmup(torch.optim.lr_scheduler._LRScheduler):
 def train(model_name: str) -> None:
     if model_name == "mnasnet0_5":
         model = models.mnasnet0_5(1000).cuda()
+    elif model_name == "mnasnet0_75":
+        model = models.mnasnet0_75(1000).cuda()
     elif model_name == "mnasnet1_0":
         model = models.mnasnet1_0(1000).cuda()
+    elif model_name == "mnasnet1_3":
+        model = models.mnasnet1_3(1000).cuda()
     else:
         raise ValueError("Don't know how to train {}".format(model_name))
     params = TRAINING_PARAMS[model_name]
