@@ -15,6 +15,6 @@ This program with hardcoded settings requires 4x NVIDIA GTX 1080ti GPUs to run. 
 
 And this PR: https://github.com/pytorch/vision/pull/829
 
-## Training log and checkpoint
+## Checkpoints
 
-See under `training_state`
+See under [checkpoints]
