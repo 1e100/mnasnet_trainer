@@ -1,4 +1,4 @@
-# MNASNet 1.0 trainer
+# MNASNet trainer
 Training setup for MNASNet that will get you close to "paper" numbers.
 
 Result after 200 epochs:
