@@ -17,4 +17,4 @@ And this PR: https://github.com/pytorch/vision/pull/829
 
 ## Checkpoints
 
-See under [checkpoints]
+See under [checkpoints](checkpoints)
