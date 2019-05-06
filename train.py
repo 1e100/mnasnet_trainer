@@ -21,10 +21,10 @@ import imagenet
 import log
 import tensorboard
 
-MODEL_NAME = "mnasnet0_75"
+MODEL_NAME = "mnasnet0_5"
 TRAINING_PARAMS = {
     "mnasnet0_5": {
-        "num_epochs": 250,
+        "num_epochs": 300,
         "base_lr": 1.0,
         "momentum": 0.9,
         "weight_decay": 0,
@@ -38,8 +38,8 @@ TRAINING_PARAMS = {
         "batch_size": 1000,
     },
     "mnasnet1_0": {
-        "num_epochs": 300,
-        "base_lr": 0.7,
+        "num_epochs": 330,
+        "base_lr": 0.5,
         "momentum": 0.9,
         "weight_decay": 1e-5,
         "batch_size": 740,
