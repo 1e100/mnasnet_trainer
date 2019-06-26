@@ -12,6 +12,7 @@ This program with hardcoded settings requires 4x NVIDIA GTX 1080ti GPUs to run. 
   * PyTorch 1.0.1+
   * PillowSIMD
   * TensorboardX
+  * tqdm (for eval only)
 
 And this PR: https://github.com/pytorch/vision/pull/829 contains the MNASNet implementation so you'll need it as well.
 
