@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-""" A training program for MNASNet family of models.
-
-All parameters are hardcoded for better reproducibility. This training harness
-targets MNASNet with various depth multipliers. To change the depth multiplier,
-simply set `MODEL_NAME` variable to the model you want. 4x1080ti are assumed.
-Fewer GPUs will require smaller batches and smaller learning rates."""
+""" An evaluation script for MNASNet. """
 
 import os
 import typing
