@@ -126,7 +126,7 @@ def train(model_name: str) -> None:
 
     message = "Training {}, cosine annealing with warmup. Parameters: {}".format(
         model_name, params)
-    train = trainer.Trainer(".", message, "classification", True,
+    train = trainer.Trainer(".", message, "multiclass_classification", True,
                             model, optimizer, loss, lr_schedule,
                             metrics.default(), cudnn_autotune=True)
 
