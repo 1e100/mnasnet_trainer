@@ -24,7 +24,7 @@ import tensorboard
 MODEL_NAME = "mnasnet0_5"
 TRAINING_PARAMS = {
     "mnasnet0_5": {
-        "num_epochs": 300,
+        "num_epochs": 350,
         "base_lr": 1.0,
         "momentum": 0.9,
         "weight_decay": 0,
@@ -124,10 +124,10 @@ def train(model_name: str) -> None:
     train_dataset = imagenet.training(IMAGENET_DIR)
     val_dataset = imagenet.validation(IMAGENET_DIR)
 
-    train = trainer.Trainer(
-        ".", "MNASNet 0.5, cosine annealing with warmup, "
-        "base_lr=1.0, 250 epochs.", "multiclass_classification", True, model,
-        optimizer, loss, lr_schedule, metrics.default(), cudnn_autotune=True)
+    message = "Training {}, cosine annealing with warmup. Parameters: {}".format(
+        model_name, params)
+    train = trainer.Trainer(".", message, True, model, optimizer, loss,
+                            lr_schedule, metrics.default(), cudnn_autotune=True)
 
     train.fit(train_dataset, val_dataset, num_epochs=params["num_epochs"],
               batch_size=params["batch_size"],
