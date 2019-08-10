@@ -53,6 +53,6 @@ def eval(model_name: str) -> None:
 
 
 if __name__ == "__main__":
-    for m in ["mnasnet1_0", "mnasnet0_5"]:
+    for m in ["mnasnet0_5"]:
         print("Evaluating pretrained", m)
         eval(m)
