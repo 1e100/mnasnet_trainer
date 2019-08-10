@@ -25,7 +25,7 @@ MODEL_NAME = "mnasnet0_5"
 TRAINING_PARAMS = {
     "mnasnet0_5": {
         "num_epochs": 350,
-        "base_lr": 1.0,
+        "base_lr": 2.0,
         "momentum": 0.9,
         "weight_decay": 0,
         "batch_size": 1000,
